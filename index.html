@@ -85,11 +85,22 @@
 </head>
 <body>
     <h1>Book Your Session</h1>
-    <form id="playerForm" name="playerForm" netlify-honeypot="bot-field" data-netlify="true">
+    <!-- This form will be submitted to Netlify -->
+    <form id="playerForm" name="playerForm" netlify-honeypot="bot-field" data-netlify="true" class="hidden">
         <input type="hidden" name="form-name" value="playerForm">
+        <input type="hidden" name="yourName">
+        <input type="hidden" name="playerName">
+        <input type="hidden" name="group">
+        <input type="hidden" name="email">
+        <input type="hidden" name="date">
+        <input type="hidden" name="amount">
         <p class="hidden">
             <label>Don't fill this out if you're human: <input name="bot-field"></label>
         </p>
+    </form>
+    
+    <!-- This is the form users see and interact with -->
+    <form id="checkoutForm">
         
         <div class="form-group">
             <label for="yourName" class="required">Your Name:</label>
@@ -128,12 +139,12 @@
         
         <div id="payment-message"></div>
     </form>
-
+    
     <script>
         // Initialize Stripe with your publishable key
         const stripe = Stripe('pk_test_51RQ9AjGdV1368um4AaDwQcdPFNVZ8aZZxxvTu89Uu2GJ4VCXH0rRIptC7jqu0EJqU95u649YdnYKuAm3j0kbXRYE00AIOeGmIm');
         
-        document.getElementById('playerForm').addEventListener('submit', async (e) => {
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
@@ -158,17 +169,20 @@
                     amount: parseFloat(document.getElementById('amount').value) * 100 // Convert to cents
                 };
                 
-                // Send form data to Netlify's form handling
-                const netlifyForm = new FormData();
-                Object.entries(formData).forEach(([key, value]) => {
-                    netlifyForm.append(key, value);
-                });
+                // Update and submit the hidden Netlify form
+                const netlifyForm = document.getElementById('playerForm');
+                netlifyForm.yourName.value = formData.yourName;
+                netlifyForm.playerName.value = formData.playerName;
+                netlifyForm.group.value = formData.group || 'No group specified';
+                netlifyForm.email.value = formData.email;
+                netlifyForm.date.value = formData.date;
+                netlifyForm.amount.value = formData.amount / 100; // Convert back to pounds
                 
-                // Submit to Netlify Forms (for data collection)
-                await fetch('/', {
+                // Submit the hidden form to Netlify
+                await fetch(netlifyForm.getAttribute('action') || '/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(netlifyForm).toString()
+                    body: new URLSearchParams(new FormData(netlifyForm)).toString()
                 });
                 
                 // Create a Checkout Session with Netlify Function
