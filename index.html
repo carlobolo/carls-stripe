@@ -170,7 +170,7 @@
                     body: new URLSearchParams(netlifyForm).toString()
                 });
                 
-                // Create a payment intent with Netlify Function
+                // Create a Checkout Session with Netlify Function
                 const response = await fetch('/.netlify/functions/create-payment-intent', {
                     method: 'POST',
                     headers: {
@@ -183,20 +183,20 @@
                             playerName: formData.playerName,
                             email: formData.email,
                             date: formData.date,
-                            group: formData.group
+                            group: formData.group || 'No group specified'
                         }
                     })
                 });
+
+                const { sessionId, error } = await response.json();
                 
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
+                if (error) {
+                    throw new Error(error);
                 }
                 
                 // Redirect to Stripe Checkout
                 const result = await stripe.redirectToCheckout({
-                    sessionId: data.sessionId
+                    sessionId: sessionId
                 });
                 
                 if (result.error) {

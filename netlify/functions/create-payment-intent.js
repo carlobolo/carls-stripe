@@ -12,28 +12,37 @@ exports.handler = async (event) => {
     try {
         const { amount, metadata } = JSON.parse(event.body);
         
-        // Create a PaymentIntent with the order amount and currency
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(amount), // Ensure amount is an integer (in cents)
-            currency: 'gbp', // Change to your currency
-            metadata: metadata,
-            // Enable automatic payment methods
-            automatic_payment_methods: {
-                enabled: true,
-            },
+        // Create a Checkout Session
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: 'gbp',
+                    product_data: {
+                        name: 'Football Session',
+                        description: `Session for ${metadata.playerName} on ${metadata.date}`,
+                    },
+                    unit_amount: amount,
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${event.headers.referer}?success=true`,
+            cancel_url: `${event.headers.referer}?canceled=true`,
+            metadata: metadata
         });
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                clientSecret: paymentIntent.client_secret,
-            }),
+                sessionId: session.id
+            })
         };
-    } catch (error) {
-        console.error('Error creating payment intent:', error);
+    } catch (err) {
+        console.error('Error creating checkout session:', err);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
+            body: JSON.stringify({ error: err.message })
         };
     }
 };
