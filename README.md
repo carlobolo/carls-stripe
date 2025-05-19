@@ -5,7 +5,7 @@ A simple player registration form hosted on GitHub Pages.
 ## Setup
 
 1. This repository is set up to be hosted on GitHub Pages
-2. Custom domain: cbj-design.co.uk
+2. https://carlobolo.github.io/carls-stripe/
 3. The main page is `index.html`
 
 ## How to Update
