@@ -1,12 +1,13 @@
-# Player Registration Form
+# Player Registration & Payment System
 
-A simple player registration form hosted on GitHub Pages.
+A simple player registration form with Stripe payment integration, deployed to Netlify.
 
-## Setup
+## Features
 
-1. This repository is set up to be hosted on GitHub Pages
-2. https://carlobolo.github.io/carls-stripe/
-3. The main page is `index.html`
+- Player registration form with validation
+- Secure Stripe payment processing
+- Netlify Forms for data collection
+- Responsive design
 
 ## How to Update
 
