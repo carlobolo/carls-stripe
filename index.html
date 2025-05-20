@@ -88,10 +88,10 @@
     <!-- This form will be submitted to Netlify -->
     <form id="playerForm" name="playerForm" netlify-honeypot="bot-field" data-netlify="true" class="hidden">
         <input type="hidden" name="form-name" value="playerForm">
-        <input type="hidden" name="group">
-        <input type="hidden" name="playerName">
-        <input type="hidden" name="date">
-        <input type="hidden" name="amount" value="10.00">
+        <input type="text" name="group">
+        <input type="text" name="playerName">
+        <input type="date" name="date">
+        <input type="number" name="amount" value="10.00" step="0.01">
         <p class="hidden">
             <label>Don't fill this out if you're human: <input name="bot-field"></label>
         </p>
@@ -100,8 +100,8 @@
     <!-- This is the form users see and interact with -->
     <form id="checkoutForm">
         <div class="form-group">
-            <label for="group" class="required">Group:</label>
-            <select id="group" name="group" class="form-control" required>
+            <label for="groupSelect" class="required">Group:</label>
+            <select id="groupSelect" name="groupSelect" class="form-control" required>
                 <option value="" disabled selected>Select a group</option>
                 <option value="Under 11">Under 11</option>
                 <option value="Open">Open</option>
@@ -115,8 +115,8 @@
         </div>
         
         <div class="form-group">
-            <label for="date" class="required">Session Date:</label>
-            <input type="date" id="date" name="date" required>
+            <label for="sessionDate" class="required">Session Date:</label>
+            <input type="date" id="sessionDate" name="sessionDate" required>
         </div>
         
         <div class="form-group">
@@ -152,19 +152,25 @@
             
             try {
                 // Collect form data
-                const formData = {
-                    playerName: document.getElementById('playerName').value,
-                    group: document.getElementById('group').value,
-                    date: document.getElementById('date').value,
-                    amount: 1000 // Fixed amount of £10.00 in cents
-                };
+                const group = document.getElementById('groupSelect').value;
+                const playerName = document.getElementById('playerName').value;
+                const sessionDate = document.getElementById('sessionDate').value;
+                const amount = 1000; // Fixed amount of £10.00 in cents
                 
                 // Update and submit the hidden Netlify form
                 const netlifyForm = document.getElementById('playerForm');
-                netlifyForm.playerName.value = formData.playerName;
-                netlifyForm.group.value = formData.group;
-                netlifyForm.date.value = formData.date;
-                netlifyForm.amount.value = (formData.amount / 100).toFixed(2); // Convert to pounds with 2 decimal places
+                netlifyForm.group.value = group;
+                netlifyForm.playerName.value = playerName;
+                netlifyForm.date.value = sessionDate;
+                netlifyForm.amount.value = (amount / 100).toFixed(2);
+                
+                // Prepare data for Stripe
+                const formData = {
+                    group: group,
+                    playerName: playerName,
+                    date: sessionDate,
+                    amount: amount
+                };
                 
                 // Submit the hidden form to Netlify
                 await fetch(netlifyForm.getAttribute('action') || '/', {
