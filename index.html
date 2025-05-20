@@ -88,12 +88,10 @@
     <!-- This form will be submitted to Netlify -->
     <form id="playerForm" name="playerForm" netlify-honeypot="bot-field" data-netlify="true" class="hidden">
         <input type="hidden" name="form-name" value="playerForm">
-        <input type="hidden" name="yourName">
-        <input type="hidden" name="playerName">
         <input type="hidden" name="group">
-        <input type="hidden" name="email">
+        <input type="hidden" name="playerName">
         <input type="hidden" name="date">
-        <input type="hidden" name="amount">
+        <input type="hidden" name="amount" value="10.00">
         <p class="hidden">
             <label>Don't fill this out if you're human: <input name="bot-field"></label>
         </p>
@@ -101,10 +99,14 @@
     
     <!-- This is the form users see and interact with -->
     <form id="checkoutForm">
-        
         <div class="form-group">
-            <label for="yourName" class="required">Your Name:</label>
-            <input type="text" id="yourName" name="yourName" required>
+            <label for="group" class="required">Group:</label>
+            <select id="group" name="group" class="form-control" required>
+                <option value="" disabled selected>Select a group</option>
+                <option value="Under 11">Under 11</option>
+                <option value="Open">Open</option>
+                <option value="Squad">Squad</option>
+            </select>
         </div>
         
         <div class="form-group">
@@ -113,26 +115,16 @@
         </div>
         
         <div class="form-group">
-            <label for="group">Your Group (optional):</label>
-            <input type="text" id="group" name="group">
-        </div>
-        
-        <div class="form-group">
-            <label for="email" class="required">Your Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        
-        <div class="form-group">
             <label for="date" class="required">Session Date:</label>
             <input type="date" id="date" name="date" required>
         </div>
         
         <div class="form-group">
-            <label for="amount" class="required">Amount to Pay (£):</label>
-            <input type="number" id="amount" name="amount" min="1" step="0.01" required>
+            <p><strong>Amount to Pay: £10.00</strong></p>
+            <input type="hidden" id="amount" name="amount" value="1000">
         </div>
         
-        <button type="submit" id="submitBtn">
+        <button type="submit" id="submitBtn" class="btn btn-primary">
             <span id="buttonText">Pay Now</span>
             <span id="spinner" class="loading" style="display: none;"></span>
         </button>
@@ -161,22 +153,18 @@
             try {
                 // Collect form data
                 const formData = {
-                    yourName: document.getElementById('yourName').value,
                     playerName: document.getElementById('playerName').value,
                     group: document.getElementById('group').value,
-                    email: document.getElementById('email').value,
                     date: document.getElementById('date').value,
-                    amount: parseFloat(document.getElementById('amount').value) * 100 // Convert to cents
+                    amount: 1000 // Fixed amount of £10.00 in cents
                 };
                 
                 // Update and submit the hidden Netlify form
                 const netlifyForm = document.getElementById('playerForm');
-                netlifyForm.yourName.value = formData.yourName;
                 netlifyForm.playerName.value = formData.playerName;
-                netlifyForm.group.value = formData.group || 'No group specified';
-                netlifyForm.email.value = formData.email;
+                netlifyForm.group.value = formData.group;
                 netlifyForm.date.value = formData.date;
-                netlifyForm.amount.value = formData.amount / 100; // Convert back to pounds
+                netlifyForm.amount.value = (formData.amount / 100).toFixed(2); // Convert to pounds with 2 decimal places
                 
                 // Submit the hidden form to Netlify
                 await fetch(netlifyForm.getAttribute('action') || '/', {

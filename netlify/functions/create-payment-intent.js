@@ -19,8 +19,8 @@ exports.handler = async (event) => {
                 price_data: {
                     currency: 'gbp',
                     product_data: {
-                        name: 'Football Session',
-                        description: `Session for ${metadata.playerName} on ${metadata.date}`,
+                        name: `Football Session - ${metadata.group}`,
+                        description: `Player: ${metadata.playerName}\nDate: ${metadata.date}`,
                     },
                     unit_amount: amount,
                 },
@@ -29,7 +29,8 @@ exports.handler = async (event) => {
             mode: 'payment',
             success_url: `${event.headers.referer}?success=true`,
             cancel_url: `${event.headers.referer}?canceled=true`,
-            metadata: metadata
+            metadata: metadata,
+            customer_email: 'carl.johnson.batts@gmail.com' // Replace with your email or remove if not needed
         });
 
         return {
